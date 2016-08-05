@@ -22,4 +22,4 @@ Fire up a internet radio and start logging songs
 
 Comment out xlwings code if you dont want to use excel to log music.
 
-## Note: the station I listen to sends out a string of artist - song name , your staytion maybe different and the parser may need to change.
+## Note: the station I listen to sends out a string of artist - song name , your station maybe different and the parser may need to change.
