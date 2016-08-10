@@ -83,30 +83,39 @@ def checkDuplicates(sheet,artist,song):
     return False
 
 def addToPlaylist(track_id):
-    scope = 'playlist-modify-public'
-    token = util.prompt_for_user_token('thedangler', scope)
+    token = spotifyAuth(config.SPOTIFY_USER_NAME)
     if token:
         sp = spotipy.Spotify(auth=token)
         sp.trace = False
-        results = sp.user_playlist_add_tracks('thedangler', '1U8C7xJVJ6nlP5OXxnVPAA', [track_id])
+        results = sp.user_playlist_add_tracks(config.SPOTIFY_USER_NAME, config.SPOTIFY_PLAYLIST_ID, [track_id])
+        print(" Spotify - Results for adding track to playlist")
         print(results)
     else:
-        print("Can't get token")
+        print(" Spotify - Can't get token")
         #"spotify:user:thedangler:playlist:1U8C7xJVJ6nlP5OXxnVPAA"
 
 
 def spotifyLookup(artist,song):
-    scope = 'user-library-read'
-    username = 'thedangler'
-    token = util.prompt_for_user_token(username,scope,config.SPOTIPY_CLIENT_ID,config.SPOTIPY_CLIENT_SECRET,config.SPOTIPY_REDIRECT_URI)
+
+    token = spotifyAuth(config.SPOTIFY_USER_NAME)
     if token:
         sp = spotipy.Spotify(auth=token)
-        search_str = "artist:%s track:$s" % (artist,song)
+        search_str = "artist:%s track:%s" % (artist,song)
         result = sp.search(search_str,limit=1,type='track')
         if len(result['tracks']['items']) > 0:
             addToPlaylist(result['tracks']['items'][0]['id'])
+        else:
+            print(" Spotify - Track not found")
     else:
-        print("Can't get token")
+        print(" Spotify - Can't get token")
+
+# does the authentication
+# TODO do error checking in here
+def spotifyAuth(username):
+    scope = 'playlist-modify-private user-library-read'
+    token = util.prompt_for_user_token(username, scope, config.SPOTIPY_CLIENT_ID,
+                                       config.SPOTIPY_CLIENT_SECRET, config.SPOTIPY_REDIRECT_URI)
+    return token
 
 while True:
     getInfo()
