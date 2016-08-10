@@ -8,3 +8,6 @@ SPOTIPY_REDIRECT_URI='http://example.com/spotify/callback/'
 SPOTIFY_USER_NAME = ''
 #playlist id, I got mine from using the test rest api on developer site.
 SPOTIFY_PLAYLIST_ID = ''
+
+#shutdown at hour
+HOUR_TO_STOP = 19
