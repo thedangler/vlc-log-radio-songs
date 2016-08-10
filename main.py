@@ -2,6 +2,7 @@ from __future__ import print_function
 import requests
 from xml.etree import ElementTree
 from html.parser import HTMLParser
+import html
 import xlwings as xw
 import time
 import sqlite3
@@ -28,16 +29,15 @@ def getInfo():
 
     root = ElementTree.fromstring(r.text)
     now_playing = root.find("./information/category[@name='meta']/info[@name='now_playing']").text
-    now_playing = parser.unescape(now_playing)
+    now_playing = html.unescape(now_playing).strip()
     msg = ''
     try:
         artist,song = now_playing.split('-',1)
         artist = artist.strip()
         song = song.strip()
         msg = logSong(artist, song)
-
     except:
-        msg = 'Wrong name format'
+        msg = 'Wrong name format for song %s' % now_playing
     finally:
         print('\r'+msg,end='')
     if 'Added' in msg:
@@ -65,11 +65,14 @@ def logSong(artist,song,own=False,downloaded=False,added_by = 'Matt'):
     nextrow = sheet.range('A1').current_region.last_cell.row
     sheet.range('A1:E1').offset(nextrow).value = [artist,song,own,downloaded,added_by]
 
-    conn = sqlite3.connect('music.db')
-    c = conn.cursor()
-    c.execute("insert into music values (?,?,?,?,?)", (artist,song,0,0,added_by))
-    conn.commit()
-    conn.close()
+    try:
+        conn = sqlite3.connect('music.db')
+        c = conn.cursor()
+        c.execute("insert into music values (?,?,?,?,?,?)", (artist,song,0,0,added_by,0))
+        conn.commit()
+        conn.close()
+    except:
+        print(' | Not Added to DB')
 
     return '%s - %s | Added' % (artist,song)
 
@@ -88,10 +91,12 @@ def addToPlaylist(track_id):
         sp = spotipy.Spotify(auth=token)
         sp.trace = False
         results = sp.user_playlist_add_tracks(config.SPOTIFY_USER_NAME, config.SPOTIFY_PLAYLIST_ID, [track_id])
-        print(" Spotify - Results for adding track to playlist")
-        print(results)
+        if results.get('snapshot_id',False):
+            return True
+        else:
+            return False
     else:
-        print(" Spotify - Can't get token")
+        print(" | Spotify - Can't get token")
         #"spotify:user:thedangler:playlist:1U8C7xJVJ6nlP5OXxnVPAA"
 
 
@@ -103,11 +108,20 @@ def spotifyLookup(artist,song):
         search_str = "artist:%s track:%s" % (artist,song)
         result = sp.search(search_str,limit=1,type='track')
         if len(result['tracks']['items']) > 0:
-            addToPlaylist(result['tracks']['items'][0]['id'])
+            if addToPlaylist(result['tracks']['items'][0]['id']):
+                try:
+                    conn = sqlite3.connect('music.db')
+                    c = conn.cursor()
+                    c.execute("update music set spotify = 1 where artist = ? and song = ?", (artist, song))
+                    conn.commit()
+                    conn.close()
+                except:
+                    print(' | Could not update DB')
+                print(" | %s - %s  Added to Spotify Playlist" % (artist,song))
         else:
-            print(" Spotify - Track not found")
+            print(" | Spotify - Track not found")
     else:
-        print(" Spotify - Can't get token")
+        print(" | Spotify - Can't get token")
 
 # does the authentication
 # TODO do error checking in here
