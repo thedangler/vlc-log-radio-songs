@@ -1,5 +1,8 @@
-# vlc-log-radio-songs
+# vlc-log-radio-songs - Windows Only
 Log all the songs playing to excel and and them to Spotify playlist
+
+# Why?
+Began as a test to see how to use xlwings. I came up with a fun problem to solve and it snowballed from there
 
 # Setup VLC
 Open vlc and goto Tools -> Preferences
@@ -31,3 +34,5 @@ Don't forget to update the config.py file with your informaiton.
 * Search for duplicates in the DB
 * Log songs to excel and DB at the end after attempting to add to spotify
 * Move filters to DB pre load from config.
+* Remove xlwings and make csv file instead
+* Test on other platforms
