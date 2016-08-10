@@ -1,3 +1,9 @@
+# Made by Matt H
+# TODO clean up code - if else indents
+# TODO Search for duplicates in the DB
+# TODO Log songs to excel and DB at the end after attempting to add to spotify
+# TODO move filters to DB pre load from config.
+
 from __future__ import print_function
 import requests
 from xml.etree import ElementTree
@@ -7,7 +13,6 @@ import xlwings as xw
 import time
 import sqlite3
 import datetime
-import sys
 import spotipy
 import spotipy.util as util
 import config
