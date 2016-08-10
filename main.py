@@ -17,6 +17,9 @@ import spotipy
 import spotipy.util as util
 import config
 import pywinauto
+import logging
+
+logging.getLogger("requests").setLevel(logging.WARNING)
 
 
 
@@ -25,6 +28,7 @@ print('Getting songs:')
 #put in the database
 filter_artist = ['Split Infinity Radio','The Voice of Crom House Band','Wasabi Speaks']
 
+# doesn't need to make a new session each time FIX THIS
 def getInfo():
 
     s = requests.Session()
@@ -137,19 +141,22 @@ def spotifyAuth(username):
                                        config.SPOTIPY_CLIENT_SECRET, config.SPOTIPY_REDIRECT_URI)
     return token
 
-while True:
-    getInfo()
-    time.sleep(60)
-    if datetime.datetime.now().time().hour == config.HOUR_TO_STOP:
-        try:
-            # close vlc player automatically and then exit the program.
-            p = pywinauto.application.Application()
-            w_handle = pywinauto.findwindows.find_windows(title_re=r'.* VLC media player')[0]
-            window = p.window_(handle=w_handle)
-            window.Close()
-        except:
-            pass
-        exit()
 
 
+if __name__ == '__main__':
+    while True:
+        getInfo()
+
+        if datetime.datetime.now().time().hour == config.HOUR_TO_STOP:
+            try:
+                # close vlc player automatically and then exit the program.
+                p = pywinauto.application.Application()
+                w_handle = pywinauto.findwindows.find_windows(title_re=r'.* VLC media player')[0]
+                window = p.window_(handle=w_handle)
+                window.Close()
+            except:
+                pass
+            exit()
+
+        time.sleep(60)
 
