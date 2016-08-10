@@ -25,3 +25,9 @@ Comment out xlwings code if you dont want to use excel to log music.
 ## Note: the station I listen to sends out a string of artist - song name , your station maybe different and the parser may need to change.
 
 Don't forget to update the config.py file with your informaiton.
+
+#### TODO
+* Clean up code - if else indents
+* Search for duplicates in the DB
+* Log songs to excel and DB at the end after attempting to add to spotify
+* Move filters to DB pre load from config.
