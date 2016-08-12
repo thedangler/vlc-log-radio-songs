@@ -39,9 +39,15 @@ def getInfo():
 
     root = ElementTree.fromstring(r.text)
     now_playing = root.find("./information/category[@name='meta']/info[@name='now_playing']").text
-    now_playing = html.unescape(now_playing).strip()
     msg = ''
+
+    if now_playing is None:
+
+        msg = 'No song title or artist in stream'
+        print('\r' + msg, end='')
+        return False
     try:
+        now_playing = html.unescape(now_playing).strip()
         artist,song = now_playing.split('-',1)
         artist = artist.strip()
         song = song.strip()
@@ -107,7 +113,6 @@ def addToPlaylist(track_id):
             return False
     else:
         print(" | Spotify - Can't get token")
-        #"spotify:user:thedangler:playlist:1U8C7xJVJ6nlP5OXxnVPAA"
 
 
 def spotifyLookup(artist,song):
@@ -141,6 +146,22 @@ def spotifyAuth(username):
                                        config.SPOTIPY_CLIENT_SECRET, config.SPOTIPY_REDIRECT_URI)
     return token
 
+#should only be run once. - not implemented
+def startHiddenVLC():
+    import vlc
+    instance = vlc.Instance()
+    player_l = instance.media_list_player_new()
+    media = instance.media_list_new([config.PLS])
+    player_l.set_media_list(media)
+    player_l.play() # starts vlc in the background and plays the music
+    p = player_l.get_media_player() # get the media player
+    m = p.get_media()
+    return m
+
+# run to get new song every so ofter - not implemented
+def getVLCSong(media):
+    media.parse()
+    return media.get_meta(12)
 
 
 if __name__ == '__main__':
