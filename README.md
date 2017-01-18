@@ -1,3 +1,11 @@
+# VLC No UI Spotify sync
+Adds songs that are being played from an internet radio station to spotify playlist.
+- Internet radio station must change the metadata for the artist and song for it to work.
+
+#helloworld hexchat show current playing song in vlc.
+
+
+
 # vlc-log-radio-songs - Windows Only
 Log all the songs playing to excel and and them to Spotify playlist
 
@@ -31,7 +39,7 @@ Don't forget to update the config.py file with your informaiton.
 
 #### TODO
 * Clean up code - if else indents
-* Search for duplicates in the DB
+* Search for duplicates in the DB - Done in VLC No UI
 * Log songs to excel and DB at the end after attempting to add to spotify
 * Move filters to DB pre load from config.
 * Remove xlwings and make csv file instead
