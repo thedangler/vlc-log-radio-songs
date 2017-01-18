@@ -32,7 +32,7 @@ filter_artist = ['Split Infinity Radio','The Voice of Crom House Band','Wasabi S
 def getInfo():
 
     s = requests.Session()
-    s.auth = ('', 'test')
+    s.auth = ('', 'password')
     r = s.get('http://localhost:8080/requests/status.xml', verify=False)
 
     parser = HTMLParser()
@@ -49,9 +49,11 @@ def getInfo():
     try:
         now_playing = html.unescape(now_playing).strip()
         artist,song = now_playing.split('-',1)
+
         artist = artist.strip()
         song = song.strip()
         msg = logSong(artist, song)
+
     except:
         msg = 'Wrong name format for song %s' % now_playing
     finally:
@@ -70,7 +72,8 @@ def filter(artist):
         return False
 
 def logSong(artist,song,own=False,downloaded=False,added_by = 'Matt'):
-    b = xw.Book('C:\\Users\\mhebel3\\Documents\\Music\\music.xls')
+
+    b = xw.Book('C:\\Users\\mhebel3\\Documents\\Music\\music2.xls')
     sheet = b.sheets['Sheet1']
 
     if checkDuplicates(sheet,artist,song):
@@ -141,7 +144,7 @@ def spotifyLookup(artist,song):
 # does the authentication
 # TODO do error checking in here
 def spotifyAuth(username):
-    scope = 'playlist-modify-private user-library-read'
+    scope = 'playlist-modify-private user-library-read playlist-modify-public'
     token = util.prompt_for_user_token(username, scope, config.SPOTIPY_CLIENT_ID,
                                        config.SPOTIPY_CLIENT_SECRET, config.SPOTIPY_REDIRECT_URI)
     return token
@@ -172,7 +175,7 @@ if __name__ == '__main__':
             try:
                 # close vlc player automatically and then exit the program.
                 p = pywinauto.application.Application()
-                w_handle = pywinauto.findwindows.find_windows(title_re=r'.* VLC media player')[0]
+                w_handle = pywinauto.findwindows.find_windows(title_re=r'.*VLC*')[0]
                 window = p.window_(handle=w_handle)
                 window.Close()
             except:
