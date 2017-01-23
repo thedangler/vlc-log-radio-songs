@@ -66,7 +66,6 @@ def spotifyAuth(username):
 
 def addToPlaylist(track_id):
     token = spotifyAuth(config.SPOTIFY_USER_NAME)
-    print(token)
     if token:
         sp = spotipy.Spotify(auth=token)
         sp.trace = False
