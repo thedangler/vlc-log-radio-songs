@@ -1,17 +1,18 @@
 import vlc
 import config
 import datetime
-import requests
 import sys
 print('Python %s' % (sys.executable))
 import spotipy
 import spotipy.util as util
 import sqlite3
+import time
 
 current_song = None
+added_counter = 0
 
 def filter(artist):
-    filter_artist = ['Split Infinity Radio', 'The Voice of Crom House Band', 'Wasabi Speaks']
+    filter_artist = ['Split Infinity Radio','Split Infnity Radio', 'The Voice of Crom House Band', 'Wasabi Speaks']
     if artist in filter_artist:
         return True
     else:
@@ -36,6 +37,7 @@ def is_duplicate(song,artist):
 
 def callback(event,player):
     global current_song
+    global added_counter
     m = player.get_media()
     if current_song != m.get_meta(vlc.Meta.NowPlaying):
         current_song = m.get_meta(vlc.Meta.NowPlaying)
@@ -51,6 +53,9 @@ def callback(event,player):
 
     #emergency quit
     if datetime.datetime.now().time().hour == config.HOUR_TO_STOP:
+        event_mngr = player.event_manager()
+        #event_mngr.event_detatch(vlc.EventType.MediaPlayerTimeChanged)
+        print("%s songs added to Spotify this session" % added_counter)
         sys.exit("Program Timed Out")
 
 def spotifyAuth(username):
@@ -61,11 +66,14 @@ def spotifyAuth(username):
 
 def addToPlaylist(track_id):
     token = spotifyAuth(config.SPOTIFY_USER_NAME)
+    print(token)
     if token:
         sp = spotipy.Spotify(auth=token)
         sp.trace = False
         results = sp.user_playlist_add_tracks(config.SPOTIFY_USER_NAME, config.SPOTIFY_PLAYLIST_ID, [track_id])
         if results.get('snapshot_id',False):
+            global added_counter
+            added_counter = added_counter + 1
             return True
         else:
             return False
@@ -144,7 +152,7 @@ def main():
 
         else:
             pass
-
+    print("%s songs added to Spotify this session" % added_counter)
     return
 
 
